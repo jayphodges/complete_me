@@ -41,4 +41,12 @@ class TreeTest < Minitest::Test
     assert_equal 5, cm.count
   end
 
+  def test_works_with_large_dataset
+    cm.populate(File.read("/usr/share/dict/words"))
+    assert_equal ["doggerel", "doggereler", "doggerelism", "doggerelist", "doggerelize", "doggerelizer"], cm.suggest("doggerel").sort
+    cm.select("doggerel", "doggerelist")
+    assert_equal "doggerelist", cm.suggest("doggerel").first
+  end
+
+
 end
