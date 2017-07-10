@@ -1,10 +1,10 @@
 # /lib/node.rb
 class Node
-  attr_accessor :complete, :child
+  attr_accessor :complete, :children
 
   def initialize
-    @complete = nil
-    @child = {}
+    @complete = false
+    @children = {}
 
   end
 end

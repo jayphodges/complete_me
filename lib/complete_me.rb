@@ -14,47 +14,27 @@ class CompleteMe
   end
 
     def insert(input, current = @root)
-      word = input
+      # @word ||= input
       array = word_to_array(input)
-      # if input.class != Array
-      #   input = input.chars # letters
-      #   insert(input)
-      # else
+      # first = array.shift
       if array.empty? == false # There are still letters in the array
-        if current.child.key(array.first) # does child have key
-          current = current.child[array.first]
-          array.delete_at(0)
-          insert(array, current)
+        first = array.shift
+        if current.children.key?(first) # does child have key
+          insert(array, current.children[first])
         else
-          current.child[array.first] = Node.new
-          current = current.child[array.first]
-          array.delete_at(0)
-          insert(array, current)
+          current.children[first] = Node.new
+          # current = current.children[first]
+          # current.children.merge!({[first.to_s] => Node.new})
+          # current.children = current.children.merge(first => Node.new)
+          # current = current.children[first]
+          # array.delete_at(0)
+          insert(array, current.children[first])
         end
       else
-        @count += 1
-        current.complete = word
+        @count += 1  # temporary working fix, move count to selective
+        current.complete = true
       end
     end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     #   until input.empty? # verify that array isn't empty
     #     # current_letter = input.shift        # current_letter = word.shift allows for some simplification
@@ -78,6 +58,7 @@ class CompleteMe
     #   # current.complete = word
     #   # @count += 1
     # end
+
   def word_to_array(input)
     if input.class == Array
       return input
@@ -87,16 +68,6 @@ class CompleteMe
     end
   end
 
-    # def break_word(input)
-    #   if input.class != Array
-    #     input = input.chars
-    #     return input
-    #     # insert(input)
-    #   else
-    #     return input
-    #     # insert(input)
-    #   end
-    # end
 
     def insert_words(words)
       words.each { |word| insert(word) }
@@ -111,13 +82,13 @@ class CompleteMe
     def traverse_nodes(input, current = @root)
       unless input == [] # .empty?
         #        current_letter = word.shift allows for some simplification
-        if current.child.key?(input.first.to_s) # node does have child
-          current = current.child[input.first.to_s]
+        if current.children.key?(input.first.to_s) # node does have children
+          current = current.children[input.first.to_s]
           input.shift
           insert(input, current)
-        else # node does not have child we want
-          current.child[input.first.to_s] = Node.new
-          current = current.child[input.first.to_s]
+        else # node does not have children we want
+          current.children[input.first] = Node.new
+          current = current.children[input.first]
           input.shift
           insert(input, current)
         end
@@ -125,8 +96,8 @@ class CompleteMe
     end
 
     def search(current, results = []) # eventually the functionality of moving through the tree needs to be its own method
-      until current.child == {} # Keep going until there are no children
-        current.child.each_value do |child_node| # each value in the array is an instance/object ID
+      until current.children == {} # Keep going until there are no childrenren
+        current.children.each_value do |child_node| # each value in the array is an instance/object ID
             @results << current.complete
             current = child_node
             search(current, @results)
@@ -153,7 +124,7 @@ class CompleteMe
 
     def prune_tree
       # Locate trees with no children
-      if current.child.child.empty? && current.complete.empty?
+      if current.children.children.empty? && current.complete.empty?
 
       # until current.child == {} # Keep going until there are no children
       #   current.child.each_value do |child_node| # each value in the array is an instance/object ID
@@ -168,15 +139,18 @@ end
 
 
 cm = CompleteMe.new
-cm.insert('bar')
 cm.insert('bat')
+puts @word
+# cm.insert('bat')
 cm.insert('bed')
-cm.insert('barn')
+puts @word
+# cm.insert('barn')
 
-# cm.populate('/usr/share/dict/words')
+cm.populate('/usr/share/dict/words')
 puts cm.count
 
 #cm.suggest('art')
+
 
 
 # binding.pry
