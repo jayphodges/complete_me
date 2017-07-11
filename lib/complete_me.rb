@@ -30,7 +30,9 @@ class CompleteMe
         insert(array, current.children[first])
       end
     else
-      @count += 1 # temporary working fix, move count to selective
+      if current.complete == false
+        @count += 1
+      end # temporary working fix, move count to selective
       current.complete = true
     end
   end
@@ -97,31 +99,57 @@ class CompleteMe
       suggest_results << (prefix + suffix.to_s)
     end
     traverse_results.clear
+    print suggest_results
     return suggest_results
   end
 
-  def select(node, word); end
+  def select(input, selection, current = @root)
+    array = word_to_array(input)
+    until array.empty? # There are still letters in the array
+      # traverse_results.push(array[0])
+      first = array.shift
+      if current.children.key?(first) # does child have key
+        select(array, current.children[first])
+      else
+        return "Word not in dictionary"
+      end
+    end
+    current.priority[selection] += 1
+    # binding.pry
+    return
+  end
+
 end
+#
 
-cm = CompleteMe.new
-cm.insert('barn')
-cm.insert('bat')
-cm.insert('bar')
-cm.insert('barn')
-cm.insert('batz')
-cm.insert('barn')
-cm.insert('com')
-cm.insert('combat')
-cm.insert('combative')
-cm.insert('compare')
-# cm.insert('pizza')
-# cm.insert('pizzaria')
-
-# cm.populate('/usr/share/dict/words')
-# puts cm.count
-cm.suggest('ba')
-puts
-cm.suggest('com')
-puts
-# cm.suggest('art')
+# cm = CompleteMe.new
+# cm.insert('barn')
+# cm.insert('bat')
+# cm.insert('bar')
+# cm.insert('barn')
+# cm.insert('batz')
+# cm.insert('barn')
+# # cm.insert('com')
+# # cm.insert('combat')
+# # cm.insert('combative')
+# # cm.insert('compare')
+# # # cm.insert('pizza')
+# # # cm.insert('pizzaria')
+# #
+# # # cm.populate('/usr/share/dict/words')
+# # # puts cm.count
+# puts "suggest(ba)"
+# cm.suggest('ba')
+# puts
+# # puts "suggest(com)"
+# # cm.suggest('com')
+# # puts "select ba"
+# cm.select('ba', 'bat')
+# puts "suggest(ba)"
+# cm.suggest('ba')
+# puts
+# puts
+# puts
+# cm.select('ba', 'bat')
+# # cm.suggest('art')
 # binding.pry
