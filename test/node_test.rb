@@ -1,3 +1,5 @@
+require 'simplecov'
+SimpleCov.start
 require './lib/node'
 require './lib/complete_me'
 # require './lib/complete_me'
@@ -22,7 +24,6 @@ class NodeTest < Minitest::Test
     node = Node.new
     assert complete
   end
-
 
   def test_nodes_are_added_with_letter_key
     cm.insert("bar", current)

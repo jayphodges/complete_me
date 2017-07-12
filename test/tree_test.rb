@@ -37,26 +37,75 @@ class TreeTest < Minitest::Test
     assert_equal 1, cm.count
   end
 
+  def test_inserting_duplicate_words
+    cm.insert("bar")
+    cm.insert("bat")
+    assert_equal 2, cm.count
+    cm.insert("bar")
+    cm.insert("bat")
+    assert_equal 2, cm.count
+  end
+
+  def test_inserting_multiple_words
+    cm.insert_words(["bar","bat","barn"])
+    assert_equal 3, cm.count
+  end
+
+  def test_populate
+    dictionary = File.read('/usr/share/dict/words')
+    cm.populate(dictionary)
+    assert_equal 235886, cm.count
+    cm.insert("notactuallyaword")
+    assert_equal 235887, cm.count
+  end
+
+  def test_priority
+    cm.insert("bat")
+    cm.select("ba", "bat")
+    assert_equal ({"bat"=>1}), cm.root.children["b"].children["a"].priority
+  end
+
+  def test_priority_incrementing
+    cm.insert("bat")
+    cm.select("ba", "bat")
+    assert_equal 1, cm.root.children["b"].children["a"].priority["bat"]
+    cm.select("ba", "bat")
+    assert_equal 2, cm.root.children["b"].children["a"].priority["bat"]
+    cm.select("ba", "bat")
+    assert_equal 3, cm.root.children["b"].children["a"].priority["bat"]
+  end
+
+  def test_select_return
+    cm.insert("bar")
+    cm.insert("bat")
+    cm.insert("barn")
+    cm.insert("battery")
+    assert_equal ["bar", "barn", "bat", "battery"], cm.suggest("ba")
+    cm.select("ba", "bat")
+    assert_equal ["bat", "bar", "barn", "battery"], cm.suggest("ba")
+  end
+
+  def test_select_false_return
+    cm.insert("bar")
+    cm.insert("bat")
+    cm.insert("barn")
+    cm.insert("battery")
+    assert_equal ["not"], cm.select("be", "betternotwork")
+  end
 
   def test_nodes_are_added_with_letter_key
     cm.insert("bar")
-    expected = "a" #not sure how to test for just the kep?
-    binding.pry
-    actual = cm.root.children.keys
-
-    assert_equal expected, actual
+    assert_equal "b", cm.root.children["b"].key
+    assert_equal "a", cm.root.children["b"].children["a"].key
+    assert_equal "r", cm.root.children["b"].children["a"].children["r"].key
   end
 
-
-def test_traversal_method
-
-  cm.insert("bar")
-  cm.insert("bat")
-  cm.insert("barn")
-  assert_equal "a", @root.children.key
-
-end
-
+  def test_node_complete_flag
+    cm.insert("bar")
+    refute cm.root.children["b"].complete
+    refute cm.root.children["b"].children["a"].complete
+    assert cm.root.children["b"].children["a"].children["r"].complete
+  end
 
   def test_counts_inserted_word
 
@@ -74,25 +123,19 @@ end
     assert_equal 5, cm.count
   end
 
-  def test_works_with_large_dataset
-    skip
-    cm.populate("/usr/share/dict/words")
-    assert_equal 1, cm.count
+  def test_false_return_for_words_not_in_dictionary
+    dictionary = File.read('/usr/share/dict/words')
+    cm.populate(dictionary)
+    assert_equal false, cm.suggest("notactuallyaword")
   end
 
-def test_suggest_method
-  cm.insert('barn')
-  cm.insert('bat')
-  cm.insert('bar')
-  cm.insert('barn')
-  cm.insert('batz')
-  cm.suggest("ba")
-
-  expected =
-  actual =
-
-  assert_equal expected, actual
-end
+  def test_suggest_method
+    cm.insert('barn')
+    cm.insert('bat')
+    cm.insert('bar')
+    cm.insert('battery')
+    assert_equal ["bar", "barn", "bat", "battery"], cm.suggest("ba")
+  end
 
 def test_collect_method
   #not sure how to test this since the input is a node; I think we want to check "collect results" against some array, but I'm not sure how to get collect results as an out put of just this method.
@@ -104,21 +147,5 @@ end
 def test_collect_and_return_integration
 end
 
-
-def test_select_method
-skip
-  cm.select("ba", "bar")
   # expected - we expect the "a" hash's priority hash to increase the value associated with the "bar" key  by one
-end
-
-def test_integration_of_select_and_suggest
-  #expect a suggestion reults array that returns our selection at the beginning.
-end
-
-end
-
-if ENV['RAILS_ENV'] == 'test'
-  require 'simplecov'
-  SimpleCov.start 'rails'
-  puts "required simplecov"
 end
