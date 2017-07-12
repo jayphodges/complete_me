@@ -69,7 +69,6 @@ class CompleteMe
         return false
       end
     else
-      binding.pry
       priority_results = current.priority
       results = collect(current)
       done = true
@@ -146,17 +145,15 @@ cm.insert('barn')
 #
 # # cm.populate('/usr/share/dict/words')
 # # puts cm.count
-cm.select('ba', 'bat')
-cm.select('ba', 'bat')
-binding.pry
+
 # binding.pry
 puts "suggest(ba)"
 cm.suggest('ba')
 puts
 # puts "suggest(com)"
 # cm.suggest('com')
-# puts "select ba"
 cm.select('ba', 'bat')
+# puts "select ba"
 puts "suggest(ba)"
 cm.suggest('ba')
 puts
