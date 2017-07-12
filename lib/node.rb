@@ -1,6 +1,9 @@
 # /lib/node.rb
 class Node
-  attr_accessor :complete, :children, :key, :priority
+  attr_accessor :complete,
+  :children,
+  :key,
+  :priority
 
   def initialize
     @complete = false
