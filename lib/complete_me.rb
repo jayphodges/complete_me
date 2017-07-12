@@ -50,15 +50,23 @@ class CompleteMe
     words.each { |word| insert(word) }
   end
 
-  def populate(file)
-    file.split.each do |word| # splits input according to newline value
-      insert(word)
-    end
+
+def populate(file)
+  file.split.each do |word| # splits input according to newline value
+    insert(word.chomp)
   end
+end
+
+  #
+  # def populate(file)
+  #   file.split.each do |word| # splits input according to newline value
+  #     binding.pry
+  #     insert(word)
+  #   end
+  # end
 
   def suggest(input, current = @root)
     results = []
-
     array = word_to_array(input)
     if array.empty? == false # There are still letters in the array
       traverse_results.push(array[0])
@@ -74,7 +82,7 @@ class CompleteMe
       done = true
       if done
         traverse_results.delete_at(-1)
-        # binding.pry
+
         return_results(traverse_results, results, priority_results)
       end
     end
@@ -107,7 +115,7 @@ class CompleteMe
       suggest_results.delete(word)
       priority << word
     end
-    print priority + suggest_results
+    # print priority + suggest_results
     return priority + suggest_results
   end
 
@@ -130,35 +138,42 @@ end
 #
 
 cm = CompleteMe.new
-cm.insert('barn')
-cm.insert('bat')
-cm.insert('bar')
-cm.insert('barn')
-cm.insert('batz')
-cm.insert('barn')
+# cm.insert('barn')
+# puts cm.count
+# cm.insert('bat')
+# puts cm.count
+# cm.insert('bar')
+# puts cm.count
+# cm.insert('batz')
+# puts cm.count
 # cm.insert('com')
+# puts cm.count
 # cm.insert('combat')
+# puts cm.count
 # cm.insert('combative')
+# puts cm.count
 # cm.insert('compare')
-# # cm.insert('pizza')
-# # cm.insert('pizzaria')
-#
-# # cm.populate('/usr/share/dict/words')
-# # puts cm.count
+# cm.insert('pizza')
+# cm.insert('pizzaria')
+# puts cm.count
+cm.populate("/usr/share/dict/words")
+# puts cm.count
+# # # puts cm.count
+# cm.select("doggerel", "doggerelist")
 
 # binding.pry
-puts "suggest(ba)"
-cm.suggest('ba')
-puts
-# puts "suggest(com)"
-# cm.suggest('com')
-cm.select('ba', 'bat')
-# puts "select ba"
-puts "suggest(ba)"
-cm.suggest('ba')
-puts
-puts
-puts
+# puts "suggest(ba)"
+# cm.suggest('ba')
+# puts
+# # puts "suggest(com)"
+# # cm.suggest('com')
+# cm.select('ba', 'bat')
+# # puts "select ba"
+# puts "suggest(ba)"
+# cm.suggest('ba')
+# puts
+# puts
+# puts
 # cm.select('ba', 'bat')
 # # cm.suggest('art')
 # binding.pry
