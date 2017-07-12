@@ -58,6 +58,7 @@ class CompleteMe
 
   def suggest(input, current = @root)
     results = []
+
     array = word_to_array(input)
     if array.empty? == false # There are still letters in the array
       traverse_results.push(array[0])
@@ -68,11 +69,14 @@ class CompleteMe
         return false
       end
     else
+      binding.pry
+      priority_results = current.priority
       results = collect(current)
       done = true
       if done
         traverse_results.delete_at(-1)
-        return_results(traverse_results, results)
+        # binding.pry
+        return_results(traverse_results, results, priority_results)
       end
     end
   end
@@ -92,15 +96,20 @@ class CompleteMe
     collect_results
   end
 
-  def return_results(traverse_results, collect_results)
+  def return_results(traverse_results, collect_results, priority_results)
     prefix = traverse_results.join('')
     suggest_results = []
+    priority = []
     collect_results.each do |suffix|
       suggest_results << (prefix + suffix.to_s)
     end
     traverse_results.clear
-    print suggest_results
-    return suggest_results
+    priority_results.each_key do |word|
+      suggest_results.delete(word)
+      priority << word
+    end
+    print priority + suggest_results
+    return priority + suggest_results
   end
 
   def select(input, selection, current = @root)
@@ -109,47 +118,50 @@ class CompleteMe
       # traverse_results.push(array[0])
       first = array.shift
       if current.children.key?(first) # does child have key
-        select(array, current.children[first])
+        select(array, selection, current.children[first])
       else
         return "Word not in dictionary"
       end
     end
     current.priority[selection] += 1
-    # binding.pry
     return
   end
 
 end
 #
 
-# cm = CompleteMe.new
-# cm.insert('barn')
-# cm.insert('bat')
-# cm.insert('bar')
-# cm.insert('barn')
-# cm.insert('batz')
-# cm.insert('barn')
-# # cm.insert('com')
-# # cm.insert('combat')
-# # cm.insert('combative')
-# # cm.insert('compare')
-# # # cm.insert('pizza')
-# # # cm.insert('pizzaria')
-# #
-# # # cm.populate('/usr/share/dict/words')
-# # # puts cm.count
-# puts "suggest(ba)"
-# cm.suggest('ba')
-# puts
-# # puts "suggest(com)"
-# # cm.suggest('com')
-# # puts "select ba"
-# cm.select('ba', 'bat')
-# puts "suggest(ba)"
-# cm.suggest('ba')
-# puts
-# puts
-# puts
+cm = CompleteMe.new
+cm.insert('barn')
+cm.insert('bat')
+cm.insert('bar')
+cm.insert('barn')
+cm.insert('batz')
+cm.insert('barn')
+# cm.insert('com')
+# cm.insert('combat')
+# cm.insert('combative')
+# cm.insert('compare')
+# # cm.insert('pizza')
+# # cm.insert('pizzaria')
+#
+# # cm.populate('/usr/share/dict/words')
+# # puts cm.count
+cm.select('ba', 'bat')
+cm.select('ba', 'bat')
+binding.pry
+# binding.pry
+puts "suggest(ba)"
+cm.suggest('ba')
+puts
+# puts "suggest(com)"
+# cm.suggest('com')
+# puts "select ba"
+cm.select('ba', 'bat')
+puts "suggest(ba)"
+cm.suggest('ba')
+puts
+puts
+puts
 # cm.select('ba', 'bat')
 # # cm.suggest('art')
 # binding.pry
