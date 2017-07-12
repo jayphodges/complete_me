@@ -1,8 +1,13 @@
+require 'simplecov'
+SimpleCov.start
 require './lib/node'
 require './lib/complete_me'
 require 'pry'
 require 'minitest/autorun'
 require 'minitest/pride'
+
+
+
 
 class TreeTest < Minitest::Test
   attr_reader :cm
@@ -43,10 +48,14 @@ class TreeTest < Minitest::Test
 
   def test_works_with_large_dataset
     cm.populate("/usr/share/dict/words")
-    cm.populate("/usr/share/dict/words")
-    cm.populate("/usr/share/dict/words")
-    assert_equal 707658, cm.count
+    assert_equal 1, cm.count
   end
 
 
+end
+
+if ENV['RAILS_ENV'] == 'test'
+  require 'simplecov'
+  SimpleCov.start 'rails'
+  puts "required simplecov"
 end
