@@ -15,7 +15,6 @@ class CompleteMe
     @traverse_results = []
     @collect_results = []
     @word = nil
-
   end
 
   def insert(input, current = @root)
@@ -30,9 +29,7 @@ class CompleteMe
         insert(array, current.children[first])
       end
     else
-      if current.complete == false
-        @count += 1
-      end
+      @count += 1 if current.complete == false
       current.complete = true
     end
   end
@@ -51,64 +48,28 @@ class CompleteMe
   end
 
   def populate(file)
-    file.split.each do |word| # splits input according to newline value
+    file.split.each do |word|
       insert(word.chomp)
     end
   end
 
-
-
-    def suggest(input, current = @root)
-      results = []
-      array = word_to_array(input)
-      if array.empty? == false # There are still letters in the array
-        traverse_results.push(array[0])
-        first = array.shift
-        if current.children.key?(first) # does child have key
-          suggest(array, current.children[first])
-        else
-          return false
-        end
+  def suggest(input, current = @root)
+    results = []
+    array = word_to_array(input)
+    if array.empty? == false # There are still letters in the array
+      traverse_results.push(array[0])
+      first = array.shift
+      if current.children.key?(first) # does child have key
+        suggest(array, current.children[first])
       else
-        priority_results = current.priority
-        results = collect(current)
-        traverse_results.delete_at(-1)
-        return_results(traverse_results, results, priority_results)
+        return false
       end
+    else
+      priority_results = current.priority
+      results = collect(current)
+      traverse_results.delete_at(-1)
+      return_results(traverse_results, results, priority_results)
     end
-
-
-
-#--------------------
-  # def suggest(input, current = @root)
-  #   results = []
-  #   priority_results = []
-  #   array = word_to_array(input)
-  #   if array.empty? == false # There are still letters in the array
-  #     traverse_results.push(array[0])
-  #     first = array.shift
-  #     if current.children.key?(first) # does child have key
-  #       suggest(array, current.children[first])
-  #     else
-  #       return false
-  #     end
-  #   else
-  #     # priority_results = current.priority
-  #     # current.priority.each_pair do |key, value|
-  #     #   priority_results << [key,value]
-  #     # end
-  #     # binding.pry
-  #     results = collect(current)
-  #     done = true
-  #     if done
-  #       traverse_results.delete_at(-1)
-  #       return_results(traverse_results, results, priority_results)
-  #     end
-  #   end
-  # end
-#===================
-  def priority_sort
-
   end
 
   def collect(current, word = '', collect_results = [])
@@ -136,103 +97,26 @@ class CompleteMe
     traverse_results.clear
     priority_results.each_pair do |key, value|
       suggest_results.delete(key)
-      priority << [key,value]
+      priority << [key, value]
     end
     priority = priority.sort_by! do |index|
       index[1]
     end.reverse
-    priority = priority.map! {|each| each.shift }
+    priority = priority.map!(&:shift)
     priority + suggest_results
   end
 
   def select(input, selection, current = @root)
-      array = word_to_array(input)
-      until array.empty?
-        first = array.shift
-        if current.children.key?(first) # does child have key
-          select(array, selection, current.children[first])
-        else
-          return "Word not in dictionary"
-        end
+    array = word_to_array(input)
+    until array.empty?
+      first = array.shift
+      if current.children.key?(first) # does child have key
+        select(array, selection, current.children[first])
+      else
+        return 'Word not in dictionary'
       end
-      current.priority[selection] += 1
-      return
+    end
+    current.priority[selection] += 1
+    nil
   end
 end
-#   def is_word_in_trie(input, current = @root)
-#     array = word_to_array(input)
-#     failure = false
-#     if !input.empty? && failure == false
-#       first = array.shift
-#       if current.children.key?(first)
-#         is_word_in_trie(array, current.children[first])
-#       else
-#         failure = true
-#         return false
-#       end
-#     elsif failure == true
-#       return false
-#     else
-#       return true
-#     end
-#   end
-# end
-
-#
-# cm = CompleteMe.new
-# cm.insert('barn')
-# puts cm.count
-# cm.insert('bat')
-# puts cm.count
-# cm.insert('bar')
-# puts cm.count
-# cm.insert('batzz')
-# puts cm.count
-# cm.select('ba', 'bat')
-# cm.select('ba', 'bat')
-# cm.select('ba', 'batz')
-# cm.select('ba', 'batz')
-# cm.select('ba', 'batz')
-# cm.select('ba', 'batzz')
-# cm.select('ba', 'batzz')
-# cm.select('ba', 'batzz')
-# # cm.suggest('ba')
-# # binding.pry
-# # # # cm.is_word_in_trie("bar")
-# # # # cm.is_word_in_trie("bad")
-# # binding.pry
-# # cm.insert('com')
-# # puts cm.count
-# # cm.insert('combat')
-# # puts cm.count
-# # cm.insert('combative')
-# # puts cm.count
-# # cm.insert('compare')
-# # cm.insert('pizza')
-# # cm.insert('pizzaria')
-# # puts cm.count
-# # dictionary = File.read('/usr/share/dict/words')
-# # cm.populate(dictionary)
-# cm.suggest("ba")
-# binding.pry
-# binding.pry
-# puts cm.count
-# # # puts cm.count
-# cm.select("doggerel", "doggerelist")
-
-# binding.pry
-# puts "suggest(ba)"
-# cm.suggest('ba')
-# puts
-# # puts "suggest(com)"
-# # cm.suggest('com')
-# cm.select('ba', 'bat')
-# # puts "select ba"
-# puts "suggest(ba)"
-# cm.suggest('ba')
-# puts
-# puts
-# puts
-# cm.select('ba', 'bat')
-# # cm.suggest('art')
-# binding.pry
