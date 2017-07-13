@@ -7,8 +7,7 @@ class CompleteMe
                 :count,
                 :results,
                 :traverse_results,
-                :collect_results,
-                :word
+                :collect_results
 
   def initialize
     @root = Node.new
@@ -16,13 +15,14 @@ class CompleteMe
     @traverse_results = []
     @collect_results = []
     @word = nil
+
   end
 
   def insert(input, current = @root)
     array = word_to_array(input)
-    if !array.empty?  # There are still letters in the array
+    if !array.empty?
       first = array.shift
-      if current.children.key?(first) # does child have key
+      if current.children.key?(first)
         insert(array, current.children[first])
       else
         current.children[first] = Node.new
@@ -32,7 +32,7 @@ class CompleteMe
     else
       if current.complete == false
         @count += 1
-      end # temporary working fix, move count to selective
+      end
       current.complete = true
     end
   end
@@ -56,31 +56,64 @@ class CompleteMe
     end
   end
 
-  def suggest(input, current = @root)
-    results = []
-    array = word_to_array(input)
-    if array.empty? == false # There are still letters in the array
-      traverse_results.push(array[0])
-      first = array.shift
-      if current.children.key?(first) # does child have key
-        suggest(array, current.children[first])
+
+
+    def suggest(input, current = @root)
+      results = []
+      array = word_to_array(input)
+      if array.empty? == false # There are still letters in the array
+        traverse_results.push(array[0])
+        first = array.shift
+        if current.children.key?(first) # does child have key
+          suggest(array, current.children[first])
+        else
+          return false
+        end
       else
-        return false
-      end
-    else
-      priority_results = current.priority
-      results = collect(current)
-      done = true
-      if done
+        priority_results = current.priority
+        results = collect(current)
         traverse_results.delete_at(-1)
         return_results(traverse_results, results, priority_results)
       end
     end
+
+
+
+#--------------------
+  # def suggest(input, current = @root)
+  #   results = []
+  #   priority_results = []
+  #   array = word_to_array(input)
+  #   if array.empty? == false # There are still letters in the array
+  #     traverse_results.push(array[0])
+  #     first = array.shift
+  #     if current.children.key?(first) # does child have key
+  #       suggest(array, current.children[first])
+  #     else
+  #       return false
+  #     end
+  #   else
+  #     # priority_results = current.priority
+  #     # current.priority.each_pair do |key, value|
+  #     #   priority_results << [key,value]
+  #     # end
+  #     # binding.pry
+  #     results = collect(current)
+  #     done = true
+  #     if done
+  #       traverse_results.delete_at(-1)
+  #       return_results(traverse_results, results, priority_results)
+  #     end
+  #   end
+  # end
+#===================
+  def priority_sort
+
   end
 
   def collect(current, word = '', collect_results = [])
     if current.complete && current.children.empty? != true
-      word += current.key # if current.key != nil
+      word += current.key
       collect_results << word
       current.children.each_value { |node| collect(node, word, collect_results) }
     elsif current.complete && current.children.empty?
@@ -101,18 +134,20 @@ class CompleteMe
       suggest_results << (prefix + suffix.to_s)
     end
     traverse_results.clear
-    priority_results.each_key do |word|
-      suggest_results.delete(word)
-      priority << word
+    priority_results.each_pair do |key, value|
+      suggest_results.delete(key)
+      priority << [key,value]
     end
-    # print priority + suggest_results
+    priority = priority.sort_by! do |index|
+      index[1]
+    end.reverse
+    priority = priority.map! {|each| each.shift }
     priority + suggest_results
   end
 
   def select(input, selection, current = @root)
       array = word_to_array(input)
-      until array.empty? # There are still letters in the array
-        # traverse_results.push(array[0])
+      until array.empty?
         first = array.shift
         if current.children.key?(first) # does child have key
           select(array, selection, current.children[first])
@@ -123,25 +158,25 @@ class CompleteMe
       current.priority[selection] += 1
       return
   end
-
-  def is_word_in_trie(input, current = @root)
-    array = word_to_array(input)
-    failure = false
-    if !input.empty? && failure == false
-      first = array.shift
-      if current.children.key?(first)
-        is_word_in_trie(array, current.children[first])
-      else
-        failure = true
-        return false
-      end
-    elsif failure == true
-      return false
-    else
-      return true
-    end
-  end
 end
+#   def is_word_in_trie(input, current = @root)
+#     array = word_to_array(input)
+#     failure = false
+#     if !input.empty? && failure == false
+#       first = array.shift
+#       if current.children.key?(first)
+#         is_word_in_trie(array, current.children[first])
+#       else
+#         failure = true
+#         return false
+#       end
+#     elsif failure == true
+#       return false
+#     else
+#       return true
+#     end
+#   end
+# end
 
 #
 # cm = CompleteMe.new
@@ -151,23 +186,35 @@ end
 # puts cm.count
 # cm.insert('bar')
 # puts cm.count
-# cm.insert('batz')
+# cm.insert('batzz')
 # puts cm.count
-# # cm.is_word_in_trie("bar")
-# # cm.is_word_in_trie("bad")
+# cm.select('ba', 'bat')
+# cm.select('ba', 'bat')
+# cm.select('ba', 'batz')
+# cm.select('ba', 'batz')
+# cm.select('ba', 'batz')
+# cm.select('ba', 'batzz')
+# cm.select('ba', 'batzz')
+# cm.select('ba', 'batzz')
+# # cm.suggest('ba')
+# # binding.pry
+# # # # cm.is_word_in_trie("bar")
+# # # # cm.is_word_in_trie("bad")
+# # binding.pry
+# # cm.insert('com')
+# # puts cm.count
+# # cm.insert('combat')
+# # puts cm.count
+# # cm.insert('combative')
+# # puts cm.count
+# # cm.insert('compare')
+# # cm.insert('pizza')
+# # cm.insert('pizzaria')
+# # puts cm.count
+# # dictionary = File.read('/usr/share/dict/words')
+# # cm.populate(dictionary)
+# cm.suggest("ba")
 # binding.pry
-# cm.insert('com')
-# puts cm.count
-# cm.insert('combat')
-# puts cm.count
-# cm.insert('combative')
-# puts cm.count
-# cm.insert('compare')
-# cm.insert('pizza')
-# cm.insert('pizzaria')
-# puts cm.count
-# dictionary = File.read('/usr/share/dict/words')
-# cm.populate(dictionary)
 # binding.pry
 # puts cm.count
 # # # puts cm.count

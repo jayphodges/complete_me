@@ -75,6 +75,18 @@ class TreeTest < Minitest::Test
     assert_equal 3, cm.root.children["b"].children["a"].priority["bat"]
   end
 
+  def test_priority_weight_on_suggest
+    dictionary = File.read('/usr/share/dict/words')
+    cm.populate(dictionary)
+    cm.select("comput", "computer")
+    cm.select("comput", "computer")
+    cm.select("comput", "computer")
+    cm.select("comput", "computist")
+    cm.select("comput", "computist")
+    cm.select("comput", "computativeness")
+    assert_equal ["computer", "computist", "computativeness", "computability", "computable", "computably", "computation", "computational", "computative", "compute", "computus"], cm.suggest("comput")
+  end
+
   def test_select_return
     cm.insert("bar")
     cm.insert("bat")
@@ -83,14 +95,6 @@ class TreeTest < Minitest::Test
     assert_equal ["bar", "barn", "bat", "battery"], cm.suggest("ba")
     cm.select("ba", "bat")
     assert_equal ["bat", "bar", "barn", "battery"], cm.suggest("ba")
-  end
-
-  def test_select_false_return
-    cm.insert("bar")
-    cm.insert("bat")
-    cm.insert("barn")
-    cm.insert("battery")
-    assert_equal ["not"], cm.select("be", "betternotwork")
   end
 
   def test_nodes_are_added_with_letter_key
@@ -108,7 +112,6 @@ class TreeTest < Minitest::Test
   end
 
   def test_counts_inserted_word
-
     cm.insert("pizza")
     cm.insert("pie")
     cm.insert("pride")
@@ -118,7 +121,6 @@ class TreeTest < Minitest::Test
   end
 
   def test_count
-    skip
     cm.insert_words(["pizza", "aardvark", "zombies", "a", "xylophones"])
     assert_equal 5, cm.count
   end
@@ -137,15 +139,4 @@ class TreeTest < Minitest::Test
     assert_equal ["bar", "barn", "bat", "battery"], cm.suggest("ba")
   end
 
-def test_collect_method
-  #not sure how to test this since the input is a node; I think we want to check "collect results" against some array, but I'm not sure how to get collect results as an out put of just this method.
-end
-
-def test_return_results_method
-end
-
-def test_collect_and_return_integration
-end
-
-  # expected - we expect the "a" hash's priority hash to increase the value associated with the "bar" key  by one
 end
