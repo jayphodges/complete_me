@@ -8,7 +8,6 @@ class Node
   def initialize
     @complete = false
     @children = {}
-    # @parent = nil
     @priority = Hash.new(0)
     @key = nil
   end
