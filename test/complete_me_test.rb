@@ -4,7 +4,7 @@ require './lib/node'
 require './lib/complete_me'
 require 'pry'
 require 'minitest/autorun'
-require 'minitest/pride'
+require 'minitest/emoji'
 
 
 
